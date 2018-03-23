@@ -8,23 +8,23 @@ find_package(glfw3 REQUIRED)
 
 add_executable(opengl_imgui_playground
         main.cpp
-        imgui/imgui.cpp
-        imgui/imgui.h
-        imgui/imgui_draw.cpp
-        imgui/imgui_internal.h
-        imgui/imconfig.h
-        imgui/stb_textedit.h
-        imgui/stb_truetype.h
-        imgui/stb_rect_pack.h
-        imgui/examples/libs/gl3w/GL/gl3w.c
-        imgui/examples/opengl3_example/imgui_impl_glfw_gl3.cpp
-        imgui/examples/opengl3_example/imgui_impl_glfw_gl3.h
+        extern/imgui/imgui.cpp
+        extern/imgui/imgui.h
+        extern/imgui/imgui_draw.cpp
+        extern/imgui/imgui_internal.h
+        extern/imgui/imconfig.h
+        extern/imgui/stb_textedit.h
+        extern/imgui/stb_truetype.h
+        extern/imgui/stb_rect_pack.h
+        extern/imgui/examples/libs/gl3w/GL/gl3w.c
+        extern/imgui/examples/opengl3_example/imgui_impl_glfw_gl3.cpp
+        extern/imgui/examples/opengl3_example/imgui_impl_glfw_gl3.h
         )
 
 include_directories(
-        imgui
-        imgui/examples/opengl3_example
-        imgui/examples/libs/gl3w
+        extern/imgui
+        extern/imgui/examples/opengl3_example
+        extern/imgui/examples/libs/gl3w
         ${OPENGL_INCLUDE_DIR}
         ${GLFW_INCLUDE_PATH}
         )

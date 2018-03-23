@@ -8,31 +8,42 @@
 using std::cerr;
 using std::endl;
 
-static void glfw_error_callback(int error, const char* description)
-{
+static void glfw_error_callback(int error, const char *description) {
   cerr << "Error " << error << ": " << description << endl;
 }
 
-int main() {
+class Application {
+ public:
+  void setup();
+  void run();
+  void cleanup();
+ private:
+  void render();
 
-  // Setup window
+};
+
+void Application::setup() {
   glfwSetErrorCallback(glfw_error_callback);
   if (!glfwInit())
-    return 1;
+    throw std::runtime_error("Failed to initialize glfw");
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #if __APPLE__
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-  GLFWwindow* window = glfwCreateWindow(1280, 720, "ImGui GLFW+OpenGL3 example", NULL, NULL);
+  GLFWwindow *window = glfwCreateWindow(1280, 720, "ImGui GLFW+OpenGL3 example", NULL, NULL);
+  if (window == nullptr) {
+    throw std::runtime_error("Failed to greate GLFW window");
+  }
   glfwMakeContextCurrent(window);
   glfwSwapInterval(1); // Enable vsync
   gl3wInit();
 
   // Setup ImGui binding
   ImGui::CreateContext();
-  ImGuiIO& io = ImGui::GetIO(); (void)io;
+  ImGuiIO &io = ImGui::GetIO();
+  (void) io;
   //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
   //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
   ImGui_ImplGlfwGL3_Init(window, true);
@@ -49,6 +60,9 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
   glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
+}
+
+void Application::run() {
   while (!glfwWindowShouldClose(window)) {
 
     // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -65,7 +79,7 @@ int main() {
       static int counter = 0;
       ImGui::Text("Hello, world!");                           // Display some text (you can use a format string too)
       ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-      ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+      ImGui::ColorEdit3("clear color", (float *) &clear_color); // Edit 3 floats representing a color
 
       ImGui::Checkbox("Another Window", &show_another_window);
 
@@ -74,7 +88,9 @@ int main() {
       ImGui::SameLine();
       ImGui::Text("counter = %d", counter);
 
-      ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+      ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+                  1000.0f / ImGui::GetIO().Framerate,
+                  ImGui::GetIO().Framerate);
     }
     // 2. Show another simple window. In most cases you will use an explicit Begin/End pair to name your windows.
     if (show_another_window) {
@@ -90,7 +106,6 @@ int main() {
     glfwGetFramebufferSize(window, &display_w, &display_h);
     glViewport(0, 0, display_w, display_h);
 
-
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glVertexAttribPointer(
@@ -98,7 +113,7 @@ int main() {
         3,
         GL_FLOAT,
         0,
-        (void*)0
+        (void *) 0
     );
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glDisableVertexAttribArray(0);
@@ -109,10 +124,17 @@ int main() {
     glfwSwapBuffers(window);
 
   }
+}
 
-  // Cleanup
+void Application::cleanup() {
   ImGui_ImplGlfwGL3_Shutdown();
   ImGui::DestroyContext();
   glfwTerminate();
+}
+int main() {
+  Application app;
+  app.setup();
+  app.run();
+  app.cleanup();
   return 0;
 }
